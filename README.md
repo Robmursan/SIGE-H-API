@@ -64,3 +64,19 @@ La solución utiliza una arquitectura desacoplada basada en microservicios/módu
 2. **Fase 2 (Semanas 3-6):** Piloto móvil de pase de lista en servicio crítico (Urgencias / Quirófanos).
 3. **Fase 3 (Semanas 7-10):** Despliegue del Portal Web Angular y Tablero Directivo.
 4. **Fase 4 (Semanas 11-12):** Rollout general en turnos TM, TV y TN.
+
+📋 Descripción del Cambio
+Módulo: Ausentismo / Cobertura / Camas / Ocupación
+Tipo de cambio: [ ] Feature [ ] Bugfix [ ] Hotfix [ ] Refactor
+Resumen:
+
+🔍 Lista de Cotejo (Checklist del Desarrollador)
+ La rama cumple con la nomenclatura (prefijo/nombre-kebab-case).
+ No se incluyeron credenciales, variables .env ni datos sensibles de pacientes.
+ El código compila localmente sin advertencias ni errores de TypeScript/linter.
+ Se verificó el flujo visual en dispositivos de escritorio y móviles.
+ 
+👥 Criterios para el Revisor (Code Review)
+ La lógica del cálculo (complejidad/ocupación) arroja resultados consistentes.
+ Las consultas y llamadas a endpoints son eficientes.
+ Se resolvieron todas las conversaciones y observaciones abiertas en este PR.
