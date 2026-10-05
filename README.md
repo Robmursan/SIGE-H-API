@@ -1,118 +1,82 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Sistema de Gestión de Asistencia y Cobertura de Enfermería - Hospital Civil de Guadalajara
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Plataforma integral (Web + Móvil) diseñada para digitalizar, optimizar y automatizar el control de asistencia, gestión de suplencias y cálculo de tasa de ausentismo del personal de enfermería en los turnos Matutino (TM), Vespertino (TV) y Nocturno (TN).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🚀 Arquitectura y Stack Tecnológico
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+La solución utiliza una arquitectura desacoplada basada en microservicios/módulos con capacidad de operación fuera de línea (*Offline-First*).
 
-## Project setup
+* **Portal Web Admin:** Angular 17+ (Signals, RxJS, Angular Material, Tailwind CSS)
+* **Aplicación Móvil:** Android Nativo (Kotlin, Jetpack Compose, Room DB, WorkManager, CameraX)
+* **Backend & API Gateway:** Node.js (NestJS) / Golang + REST API + WebSockets (Socket.io)
+* **Base de Datos & Caché:** PostgreSQL + Redis
+* **Seguridad:** JWT, TLS 1.3, SQLCipher (cifrado local en Android)
 
-```bash
-$ pnpm install
-```
+---
 
-## Compile and run the project
+## 👥 Perfiles de Usuario (RBAC)
 
-```bash
-# development
-$ pnpm run start
+1. **Jefe de Piso (Móvil):** Realiza el pase de lista inicial en área con casillas de verificación (*checks* por excepción) y registra incidencias directas.
+2. **Supervisor de Turno (Móvil/Web):** Monitorea el avance de asistencia en múltiples áreas, aprueba permutas/incidencias y reasigna personal en tiempo real.
+3. **Coordinador de Enfermería (Web):** Administra el banco de suplentes temporales (RUD), programa roles de turno y asigna coberturas de mediano/largo plazo.
+4. **Jefa de Enfermería / Administrador (Web):** Accede al Dashboard Directivo con métricas globales, administra usuarios y configura parámetros institucionales.
 
-# watch mode
-$ pnpm run start:dev
+---
 
-# production mode
-$ pnpm run start:prod
-```
+## 📋 Requerimientos Funcionales Clave
 
-## Run tests
+### Móvil (Android)
+* **Pase de Lista Rápido:** Selección por defecto (*Presente*) con desmarque (*Uncheck*) para registro de falta/incidencia en < 60 segundos por área.
+* **Operación Offline-First:** Almacenamiento local mediante Room DB y sincronización automática en segundo plano con WorkManager.
+* **Lectura de Credencial QR:** Validación rápida de presencia mediante CameraX.
 
-```bash
-# unit tests
-$ pnpm run test
+### Web (Angular)
+* **Dashboard Térmico en Tiempo Real:** Visualización por mapa de calor del estatus de asistencia y alertas de áreas sin cobertura.
+* **Cálculo Automatizado de Ausentismo:** Eliminación de errores de cálculo manuales (`#DIV/0!`, `#REF!`).
+* **Reasignación Drag-and-Drop:** Arrastrar y soltar personal entre servicios del mismo turno.
 
-# e2e tests
-$ pnpm run test:e2e
+---
 
-# test coverage
-$ pnpm run test:cov
-```
+## 🗄️ Modelo de Datos (Dominio)
 
-## Deployment
+* `Empleado`: ID, RUD, Nombre, Categoria, TipoContrato (Base/Temporal).
+* `Servicio_Area`: ID, NombreArea, Piso, Critico (Boolean).
+* `Programacion_Plantilla`: ID, EmpleadoID, ServicioID, Fecha, Turno (TM/TV/TN).
+* `Registro_Asistencia`: ID, ProgramacionID, Asistio (Boolean), Incidencia, Sincronizado (Boolean).
+* `Cobertura_Suplente`: ID, RegistroAsistenciaID, EmpleadoSuplenteID, HoraAsignacion.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## ⚙️ Requerimientos No Funcionales
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+* **Tiempo de Respuesta:** < 200 ms por acción táctil en la app móvil.
+* **Concurrencia:** Soporte de hasta 500 pases de lista simultáneos al inicio de turno.
+* **Ergonomía Táctil:** Áreas de toque de mínimo 48x48 dp para uso con una sola mano en pasillo.
+* **Disponibilidad:** 99.9% de *uptime* en servicios centrales.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Observability
+## 📅 Roadmap de Implementación
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+1. **Fase 1 (Semanas 1-2):** Migración y limpieza de datos desde archivos base (`PLAN. TEM`, `TEMPORALES`, `DATOS`) a PostgreSQL.
+2. **Fase 2 (Semanas 3-6):** Piloto móvil de pase de lista en servicio crítico (Urgencias / Quirófanos).
+3. **Fase 3 (Semanas 7-10):** Despliegue del Portal Web Angular y Tablero Directivo.
+4. **Fase 4 (Semanas 11-12):** Rollout general en turnos TM, TV y TN.
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+📋 Descripción del Cambio
+Módulo: Ausentismo / Cobertura / Camas / Ocupación
+Tipo de cambio: [ ] Feature [ ] Bugfix [ ] Hotfix [ ] Refactor
+Resumen:
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-This project is already instrumented. Create a free account at [observe.nestjs.com](https://observe.nestjs.com), add an application, and paste the generated app key and secret into the `ObserveModule.forRoot()` call in `src/app.module.ts`.
-
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+🔍 Lista de Cotejo (Checklist del Desarrollador)
+ La rama cumple con la nomenclatura (prefijo/nombre-kebab-case).
+ No se incluyeron credenciales, variables .env ni datos sensibles de pacientes.
+ El código compila localmente sin advertencias ni errores de TypeScript/linter.
+ Se verificó el flujo visual en dispositivos de escritorio y móviles.
+ 
+👥 Criterios para el Revisor (Code Review)
+ La lógica del cálculo (complejidad/ocupación) arroja resultados consistentes.
+ Las consultas y llamadas a endpoints son eficientes.
+ Se resolvieron todas las conversaciones y observaciones abiertas en este PR.
